@@ -4,8 +4,9 @@ const co = require('co')
 const TIME_OUT = 2000
 
 class SocketReq {
-  constructor(socket) {
+  constructor(socket, receiver) {
     this.socket = socket
+    this.receiver = receiver
   }
 
   sendReq(data, method, option) {
@@ -27,12 +28,28 @@ class SocketReq {
             }
           }.bind(this))
         }
-        setTimeout(() => {
-          this.socket.removeListener('data', callback)
-          reject('socket获取数据超时')
-        }, TIME_OUT)
       }
       this.socket.on('data', callback)
+
+      setTimeout(() => {
+        this.socket.removeListener('data', callback)
+        reject('socket获取数据超时')
+      }, TIME_OUT)
+    })
+  }
+
+  sendReqWithReceiver(data, eventName, option) {
+    return new Promise((resolve, reject) => {
+      this.socket.write(data)
+      const callback = data => {
+        resolve(data)
+        this.receiver.removeListener(eventName, callback)
+      }
+      this.receiver.on(eventName, callback)
+      setTimeout(() => {
+        this.receiver.removeListener(eventName, callback)
+        reject('socket获取数据超时')
+      }, TIME_OUT)
     })
   }
 }
