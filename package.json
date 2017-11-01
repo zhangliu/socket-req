@@ -1,6 +1,6 @@
 {
   "name": "socket-req",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "lib for socket request",
   "main": "index.js",
   "scripts": {
